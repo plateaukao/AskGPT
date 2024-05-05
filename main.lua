@@ -16,6 +16,7 @@ function AskGPT:init()
       enabled = Device:hasClipboard(),
       callback = function()
         showChatGPTDialog(self.ui, _reader_highlight_instance.selected_text.text)
+        _reader_highlight_instance:onClose()
       end,
     }
   end)
