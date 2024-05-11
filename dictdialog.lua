@@ -13,7 +13,7 @@ local function showChatGPTDialog(ui, highlightedText, message_history)
     {
       role = "system",
       content =
-      "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly. Answer as concisely as possible and in Traditional Chinese.",
+      "You are a dictionary with high quality vocabulary definitions and examples.",
     },
   }
   -- Add a loading message
@@ -29,15 +29,16 @@ local function showChatGPTDialog(ui, highlightedText, message_history)
             local context_message = {
               role = "user",
               content = 
-                  "sentence: " .. prev_context .. "<<" .. highlightedText .. ">>" .. "\n" ..
-                  "explain vocabulary or content in <<>> in zh-TW in following format\n" .. 
+                  prev_context .. "<<" .. highlightedText .. ">>" .. next_context .. "\n" ..
+                  "explain vocabulary or content in <<>> in above sentence, in zh-TW with following format\n" .. 
                   "1. explanation\n" ..
                   "2. vocabulary original form. if it's Japanese, show its hiragana spelling\n" ..
-                  "3. example with the vocab, and show zh-tw translation in second line\n" ..
-                  "only show answers, no extra information\n" ..
+                  "3. give an example in original language; and also attach zh-tw translation in second line\n" ..
+                  "only show replies; no extra description nor information\n" ..
                   "----\n" ..
-                  "example as below:\n" ..
-                  "sentence: 人の心は<<読める>>か？" ..
+                  "here's an example\n" ..
+                  "人の心は<<読める>>か？" ..
+                  "and here's what to output:" ..
                   "1. 理解，讀取\n"..
                   "2. 読む(よむ)\n"..
                   "3. 日本語が読めます。\n"..
