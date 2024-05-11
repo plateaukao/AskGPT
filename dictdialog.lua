@@ -22,12 +22,19 @@ local function showChatGPTDialog(ui, highlightedText, message_history)
             local context_message = {
               role = "user",
               content = 
-                  "完整句子: " .. prev_context .. "<<" .. highlightedText .. ">>" .. "\n" ..
-                  "將上述句子中 <<>> 中的內容 1. 翻譯成 zh-TW\n" ..
-                  "2. 顯示單字原型;如果是日文單字，則顯示漢字拼法 (原本語言)\n" ..
-                  "3. 舉一個新的例句 (原本語言與 zh-TW 對照，各佔一行)\n" ..
-                  "只回答，不要重覆提示\n\n" ..
-                  "<<" .. highlightedText .. ">>",
+                  "sentence: " .. prev_context .. "<<" .. highlightedText .. ">>" .. "\n" ..
+                  "explain vocabulary or content in <<>> in zh-TW in following format\n" .. 
+                  "1. explanation\n" ..
+                  "2. vocabulary original form. if it's Japanese, show its hiragana spelling\n" ..
+                  "3. example with the vocab, and show zh-tw translation in second line\n" ..
+                  "only show answers, no extra information\n" ..
+                  "----\n" ..
+                  "example as below:\n" ..
+                  "sentence: 人の心は<<読める>>か？" ..
+                  "1. 理解，讀取\n"..
+                  "2. 読む(よむ)\n"..
+                  "3. 日本語が読めます。\n"..
+                  "   我能讀懂日文。\n",
             }
             table.insert(message_history, context_message)
 
