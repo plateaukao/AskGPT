@@ -16,6 +16,13 @@ local function showChatGPTDialog(ui, highlightedText, message_history)
       "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly. Answer as concisely as possible and in Traditional Chinese.",
     },
   }
+  -- Add a loading message
+  local InfoMessage = require("ui/widget/infomessage")
+  local loading = InfoMessage:new {
+    text = _("Loading..."),
+    timeout = 1,
+  }
+  UIManager:show(loading)
 
   prev_context, next_context = ui.highlight:getSelectedWordContext(15)
             -- Give context to the question
