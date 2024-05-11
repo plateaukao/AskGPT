@@ -24,7 +24,7 @@ local function showChatGPTDialog(ui, highlightedText, message_history)
   }
   UIManager:show(loading)
 
-  prev_context, next_context = ui.highlight:getSelectedWordContext(15)
+  prev_context, next_context = ui.highlight:getSelectedWordContext(10)
             -- Give context to the question
             local context_message = {
               role = "user",
