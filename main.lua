@@ -15,6 +15,7 @@ function AskGPT:init()
       text = _("Ask ChatGPT"),
       enabled = Device:hasClipboard(),
       callback = function()
+        prev_context, next_context = _reader_highlight_instance:getSelectedWordContext(15)
         showChatGPTDialog(self.ui, _reader_highlight_instance.selected_text.text)
         _reader_highlight_instance:onClose()
       end,

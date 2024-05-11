@@ -16,6 +16,9 @@ local function showChatGPTDialog(ui, highlightedText, message_history)
       "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly. Answer as concisely as possible and in Traditional Chinese.",
     },
   }
+
+  prev_context, next_context = ui.highlight:getSelectedWordContext(15)
+
   local input_dialog
   input_dialog = InputDialog:new {
     title = _("Ask a question about the highlighted text"),
@@ -112,7 +115,7 @@ local function showChatGPTDialog(ui, highlightedText, message_history)
         },
         {
           text = _("字典"),
-          calyreyreygggguygiuyback = function()
+          callback = function()
             local InfoMessage = require("ui/widget/infomessage")
             local loading = InfoMessage:new {
               text = _("Loading..."),
@@ -124,9 +127,11 @@ local function showChatGPTDialog(ui, highlightedText, message_history)
             local question = input_dialog:getInputText()
             local context_message = {
               role = "user",
-              content = "將下面 <<>> 中的內容 1. 翻譯成 zh-TW\n" ..
+              content = 
+                  "完整句子: " .. prev_context .. "<<" .. highlightedText .. ">>" .. "\n" ..
+                  "將上述句子中 <<>> 中的內容 1. 翻譯成 zh-TW\n" ..
                   "2. 顯示單字原型;如果是日文單字，則顯示漢字拼法 (原本語言)\n" ..
-                  "3. 例句 (原本語言與 zh-TW 對照，各佔一行)\n" ..
+                  "3. 舉一個新的例句 (原本語言與 zh-TW 對照，各佔一行)\n" ..
                   "只回答，不要重覆提示\n\n" ..
                   "<<" .. highlightedText .. ">>",
             }
@@ -141,7 +146,9 @@ local function showChatGPTDialog(ui, highlightedText, message_history)
 
             table.insert(message_history, answer_message)
             UIManager:close(input_dialog)
-            local result_text = "\"" .. highlightedText .. "\"" ..  "\n" .. answer
+            local result_text = 
+              prev_context .. "<<" .. highlightedText .. ">>" .. next_context .. "\n\n" ..
+              answer
 
             local function createResultText(highlightedText, message_history)
               local result_text = "\"" .. highlightedText .. "\"\n\n"
