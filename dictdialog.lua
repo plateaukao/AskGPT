@@ -92,7 +92,7 @@ local function showChatGPTDialog(ui, highlightedText, message_history)
             end
 
             local chatgpt_viewer = ChatGPTViewer:new {
-              title = _("AskGPT"),
+              title = _("GPT Dictionary"),
               text = result_text,
               onAskQuestion = handleNewQuestion, -- Pass the callback function
             }

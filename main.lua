@@ -4,6 +4,7 @@ local _ = require("gettext")
 
 local showChatGPTDialog = require("askdialog")
 local showDictionaryDialog = require("dictdialog")
+local showTranslateDialog = require("translatedialog")
 
 local AskGPT = InputContainer:new {
   name = "askgpt",
@@ -28,6 +29,16 @@ function AskGPT:init()
       enabled = Device:hasClipboard(),
       callback = function()
         showDictionaryDialog(self.ui, _reader_highlight_instance.selected_text.text)
+        _reader_highlight_instance:onClose()
+      end,
+    }
+  end)
+  self.ui.highlight:addToHighlightDialog("askgpt_Translate", function(_reader_highlight_instance)
+    return {
+      text = _("ChatGPT Translate"),
+      enabled = Device:hasClipboard(),
+      callback = function()
+        showTranslateDialog(self.ui, _reader_highlight_instance.selected_text.text)
         _reader_highlight_instance:onClose()
       end,
     }

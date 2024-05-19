@@ -6,57 +6,28 @@ local _ = require("gettext")
 local queryChatGPT = require("gpt_query")
 
 local function showChatGPTDialog(ui, highlightedText, message_history)
-  local title, author =
-      ui.document:getProps().title or _("Unknown Title"),
-      ui.document:getProps().authors or _("Unknown Author")
   local message_history = message_history or {
     {
       role = "system",
       content =
-      "You are an erudite, who is helpful, creative, clever. Answer as concisely as possible and in Traditional Chinese." ..
-      "If there's no instructions, please explain the input in 100 words.",
+      "You are a good translator.",
     },
   }
+  -- Add a loading message
+  local InfoMessage = require("ui/widget/infomessage")
+  local loading = InfoMessage:new {
+    text = _("Loading..."),
+    timeout = 1,
+  }
+  UIManager:show(loading)
 
-  local input_dialog
-  input_dialog = InputDialog:new {
-    title = _("Ask a question about the highlighted text"),
-    input_hint = _("Type your question here..."),
-    input_type = "text",
-    buttons = {
-      {
-        {
-          text = _("Cancel"),
-          callback = function()
-            UIManager:close(input_dialog)
-          end,
-        },
-        {
-          text = _("Ask"),
-          callback = function()
-            local InfoMessage = require("ui/widget/infomessage")
-            local loading = InfoMessage:new {
-              text = _("Loading..."),
-              timeout = 1,
-            }
-            UIManager:show(loading)
-
+  prev_context, next_context = ui.highlight:getSelectedWordContext(10)
             -- Give context to the question
             local context_message = {
               role = "user",
-              content = "I'm reading something titled '" ..
-                  title ..
-                  "' by " .. author .. ". I have a question about the following highlighted text: " .. highlightedText,
+              content = "translate content in zh-hant:\n" .. highlightedText
             }
             table.insert(message_history, context_message)
-
-            -- Ask the question
-            local question = input_dialog:getInputText()
-            local question_message = {
-              role = "user",
-              content = question,
-            }
-            table.insert(message_history, question_message)
 
             local answer = queryChatGPT(message_history)
             -- Save the answer to the message history
@@ -67,9 +38,7 @@ local function showChatGPTDialog(ui, highlightedText, message_history)
 
             table.insert(message_history, answer_message)
             UIManager:close(input_dialog)
-            local result_text = _("Highlighted text: ") .. "\"" .. highlightedText .. "\"" ..
-                "\n\n" .. _("User: ") .. question ..
-                "\n\n" .. _("ChatGPT: ") .. answer .. "\n\n"
+            local result_text = answer
 
             local function createResultText(highlightedText, message_history)
               local result_text = "\"" .. highlightedText .. "\"\n\n"
@@ -104,19 +73,12 @@ local function showChatGPTDialog(ui, highlightedText, message_history)
             end
 
             local chatgpt_viewer = ChatGPTViewer:new {
-              title = _("AskGPT"),
+              title = _("GPT Translate"),
               text = result_text,
               onAskQuestion = handleNewQuestion, -- Pass the callback function
             }
 
             UIManager:show(chatgpt_viewer)
-          end,
-        },
-      },
-    },
-  }
-  UIManager:show(input_dialog)
-  input_dialog:onShowKeyboard()
 end
 
 return showChatGPTDialog
