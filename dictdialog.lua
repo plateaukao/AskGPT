@@ -13,17 +13,9 @@ local function showChatGPTDialog(ui, highlightedText, message_history)
     {
       role = "system",
       content =
-      "You are a dictionary with high quality vocabulary definitions and examples.",
+      "You are a dictionary with high quality detail vocabulary definitions and examples.",
     },
   }
-  -- Add a loading message
-  local InfoMessage = require("ui/widget/infomessage")
-  local loading = InfoMessage:new {
-    text = _("Loading..."),
-    timeout = 1,
-  }
-  UIManager:show(loading)
-
   prev_context, next_context = ui.highlight:getSelectedWordContext(10)
             -- Give context to the question
             local context_message = {
@@ -39,10 +31,10 @@ local function showChatGPTDialog(ui, highlightedText, message_history)
                   "here's an example\n" ..
                   "人の心は<<読める>>か？" ..
                   "and here's what to output:" ..
-                  "1. 理解，讀取\n"..
-                  "2. 読む(よむ)\n"..
-                  "3. 日本語が読めます。\n"..
-                  "   我能讀懂日文。\n",
+                  "1.指能夠理解或猜測他人的想法或情感。\n"..
+                  "2.読める（よめる）\n"..
+                  "3.彼の表情から彼女の気持ちが読める。\n"..
+                  "  從他的表情可以讀出她的心情。\n",
             }
             table.insert(message_history, context_message)
 

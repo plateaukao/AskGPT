@@ -13,13 +13,6 @@ local function showChatGPTDialog(ui, highlightedText, message_history)
       "You are a good translator.",
     },
   }
-  -- Add a loading message
-  local InfoMessage = require("ui/widget/infomessage")
-  local loading = InfoMessage:new {
-    text = _("Loading..."),
-    timeout = 1,
-  }
-  UIManager:show(loading)
 
   prev_context, next_context = ui.highlight:getSelectedWordContext(10)
             -- Give context to the question
