@@ -27,11 +27,7 @@ function AskGPT:init()
       text = _("Ask ChatGPT"),
       enabled = Device:hasClipboard(),
       callback = function()
-        showLoadingDialog()
-        UIManager:scheduleIn(0.1, function()
-          showChatGPTDialog(self.ui, _reader_highlight_instance.selected_text.text)
-          _reader_highlight_instance:onClose()
-        end)
+        showChatGPTDialog(self.ui, _reader_highlight_instance.selected_text.text)
       end,
     }
   end)
@@ -43,7 +39,6 @@ function AskGPT:init()
         showLoadingDialog()
         UIManager:scheduleIn(0.1, function()
           showDictionaryDialog(self.ui, _reader_highlight_instance.selected_text.text)
-          _reader_highlight_instance:onClose()
         end)
       end,
     }
@@ -56,7 +51,6 @@ function AskGPT:init()
         showLoadingDialog()
         UIManager:scheduleIn(0.1, function()
           showTranslateDialog(self.ui, _reader_highlight_instance.selected_text.text)
-          _reader_highlight_instance:onClose()
         end)
       end,
     }

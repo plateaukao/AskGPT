@@ -34,6 +34,7 @@ local _ = require("gettext")
 local Screen = Device.screen
 
 local ChatGPTViewer = InputContainer:extend {
+  ui = nil,
   title = nil,
   text = nil,
   width = nil,
@@ -66,6 +67,7 @@ local ChatGPTViewer = InputContainer:extend {
   find_centered_lines_count = 5, -- line with find results to be not far from the center
 
   onAskQuestion = nil,
+  onAddToNote = nil,
 }
 
 function ChatGPTViewer:init()
@@ -78,7 +80,7 @@ function ChatGPTViewer:init()
   }
   self.width = self.width or (Screen:getWidth() * 2 / 3)
   -- self.height = self.height or Screen:getHeight() - Screen:scaleBySize(30)
-  self.height = Screen:scaleBySize(400)
+  self.height = Screen:scaleBySize(600)
 
   self._find_next = false
   self._find_next_button = false
@@ -214,6 +216,13 @@ function ChatGPTViewer:init()
       hold_callback = self.default_hold_callback,
       allow_hold_when_disabled = true,
     },
+    {
+      text = _("Add note"),
+      id = "add_note",
+      callback = function()
+        self:addToNote()
+      end,
+    },
   }
   local buttons = self.buttons_table or {}
   if self.add_default_buttons or not self.buttons_table then
@@ -294,6 +303,10 @@ function ChatGPTViewer:init()
   }
 end
 
+function ChatGPTViewer:addToNote()
+  self:onAddToNote()
+end
+
 function ChatGPTViewer:askAnotherQuestion()
   local input_dialog
   input_dialog = InputDialog:new {
@@ -357,6 +370,8 @@ end
 
 function ChatGPTViewer:onClose()
   UIManager:close(self)
+  self.ui.highlight:onClose()
+
   if self.close_callback then
     self.close_callback()
   end
@@ -458,6 +473,7 @@ function ChatGPTViewer:update(new_text)
     height = self.height,
     buttons_table = self.buttons_table,
     onAskQuestion = self.onAskQuestion,
+    onAddToNote = self.onAddToNote,
   }
   updated_viewer.scroll_text_w:scrollToBottom()
   UIManager:show(updated_viewer)

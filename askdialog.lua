@@ -103,10 +103,21 @@ local function showChatGPTDialog(ui, highlightedText, message_history)
               chatgpt_viewer:update(result_text)
             end
 
-            local chatgpt_viewer = ChatGPTViewer:new {
+            local chatgpt_viewer = nil
+
+            local function handleAddToNote()
+              ui.highlight:addNote(result_text)
+              UIManager:close(chatgpt_viewer)
+              ui.highlight:onClose()
+            end
+
+
+            chatgpt_viewer = ChatGPTViewer:new {
+              ui = ui,
               title = _("AskGPT"),
               text = result_text,
               onAskQuestion = handleNewQuestion, -- Pass the callback function
+              onAddToNote = handleAddToNote,
             }
 
             UIManager:show(chatgpt_viewer)
