@@ -37,7 +37,7 @@ function AskGPT:init()
   end)
   self.ui.highlight:addToHighlightDialog("askgpt_Dict", function(_reader_highlight_instance)
     return {
-      text = _("ChatGPT Dictionary"),
+      text = _("GPT Dictionary"),
       enabled = Device:hasClipboard(),
       callback = function()
         showLoadingDialog()
@@ -50,7 +50,7 @@ function AskGPT:init()
   end)
   self.ui.highlight:addToHighlightDialog("askgpt_Translate", function(_reader_highlight_instance)
     return {
-      text = _("ChatGPT Translate"),
+      text = _("GPT Translate"),
       enabled = Device:hasClipboard(),
       callback = function()
         showLoadingDialog()
