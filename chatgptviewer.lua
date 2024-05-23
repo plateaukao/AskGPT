@@ -66,6 +66,7 @@ local ChatGPTViewer = InputContainer:extend {
   default_hold_callback = nil,   -- on each default button
   find_centered_lines_count = 5, -- line with find results to be not far from the center
 
+  showAskQuestion = true,
   onAskQuestion = nil,
   onAddToNote = nil,
 }
@@ -192,7 +193,7 @@ function ChatGPTViewer:init()
   local default_buttons =
   {
     {
-      text = _("Ask Another Question"),
+      text = _("Ask more"),
       id = "ask_another_question",
       callback = function()
         self:askAnotherQuestion()
@@ -308,6 +309,11 @@ function ChatGPTViewer:addToNote()
 end
 
 function ChatGPTViewer:askAnotherQuestion()
+  if not self.showAskQuestion then
+    self:onAskQuestion("")
+    return ""
+  end
+
   local input_dialog
   input_dialog = InputDialog:new {
     title = _("Ask another question"),
@@ -370,7 +376,9 @@ end
 
 function ChatGPTViewer:onClose()
   UIManager:close(self)
-  self.ui.highlight:onClose()
+  if self.ui and self.ui.highlight then
+    self.ui.highlight:onClose()
+  end
 
   if self.close_callback then
     self.close_callback()
@@ -471,6 +479,7 @@ function ChatGPTViewer:update(new_text)
     text = new_text,
     width = self.width,
     height = self.height,
+    showAskQuestion = self.showAskQuestion,
     buttons_table = self.buttons_table,
     onAskQuestion = self.onAskQuestion,
     onAddToNote = self.onAddToNote,

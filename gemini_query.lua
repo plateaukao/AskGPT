@@ -1,7 +1,9 @@
 local API_KEY = require("gemini_api_key")
+local PROMPTS = require("prompts")
 local https = require("ssl.https")
 local ltn12 = require("ltn12")
 local json = require("json")
+
 
 local function queryGemini(context_message)
   local api_url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=" .. API_KEY.key
