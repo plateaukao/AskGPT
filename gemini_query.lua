@@ -1,5 +1,4 @@
 local API_KEY = require("gemini_api_key")
-local PROMPTS = require("prompts")
 local https = require("ssl.https")
 local ltn12 = require("ltn12")
 local json = require("json")
@@ -15,8 +14,16 @@ local function queryGemini(context_message)
   local data = {
     contents = {
         {
-            parts = {{ text = context_message }}
+            parts = {{ 
+              text = context_message ,
+            }}
         }
+    },
+    safety_settings = {
+      { category = "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold = "BLOCK_ONLY_HIGH" },
+      { category = "HARM_CATEGORY_HATE_SPEECH", threshold = "BLOCK_ONLY_HIGH" },
+      { category = "HARM_CATEGORY_HARASSMENT", threshold = "BLOCK_ONLY_HIGH" },
+      { category = "HARM_CATEGORY_DANGEROUS_CONTENT", threshold = "BLOCK_ONLY_HIGH" }
     }
   }
 
@@ -33,11 +40,12 @@ local function queryGemini(context_message)
   }
 
   if code ~= 200 then
-    error("Error querying ChatGPT API: " .. code)
+    return "Error querying Gemini API: " .. code
   end
 
   local response = json.decode(table.concat(responseBody))
   return response.candidates[1].content.parts[1].text
+  -- return table.concat(responseBody)
 end
 
 return queryGemini

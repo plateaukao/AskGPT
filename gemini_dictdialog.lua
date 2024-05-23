@@ -13,7 +13,15 @@ local function showGeminiDictDialog(ui, highlightedText, message_history)
   local context_message = prev_context .. "<<" .. highlightedText .. ">>" .. next_context .. "\n" ..
         PROMPTS.dict
 
-  local answer = queryGemini(context_message)
+  local success, result = pcall(function()
+    return queryGemini(context_message)
+  end)
+  if success then
+    answer = result
+  else
+    answer = "Error: " .. result
+  end
+
   local function createResultText(highlightedText, answer)
     local result_text = 
       TextBoxWidget.PTF_HEADER .. 
