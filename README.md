@@ -20,6 +20,16 @@ local API_KEY = {
 return API_KEY
 ```
 
+An API key from Google Gemini. Once you have your API key, create a `gemini_api_key.lua` file in the following structure:
+
+```lua
+local API_KEY = {
+  key = "your_api_key",
+}
+
+return API_KEY
+```
+
 If you clone this project, you should be able to put the directory, `askgpt.koplugin`, in the `koreader/plugins` directory and it should work. If you want to use the plugin without cloning the project, you can download the zip file from the releases page and extract the `askgpt.koplugin` directory to the `koreader/plugins` directory.
 
 ## How To Use
