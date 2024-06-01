@@ -1,6 +1,8 @@
 local InputDialog = require("ui/widget/inputdialog")
 local ChatGPTViewer = require("chatgptviewer")
 local UIManager = require("ui/uimanager")
+local Event = require("ui/event")
+
 local _ = require("gettext")
 
 local queryChatGPT = require("gpt_query")
@@ -106,7 +108,13 @@ local function showChatGPTDialog(ui, highlightedText, message_history)
             local chatgpt_viewer = nil
 
             local function handleAddToNote()
-              ui.highlight:addNote(result_text)
+              -- ui.highlight:addNote(result_text)
+              local index = ui.highlight:saveHighlight(true)
+              local a = ui.annotation.annotations[index]
+              a.note = result_text
+              ui:handleEvent(Event:new("AnnotationsModified",
+                                    { a, nb_highlights_added = -1, nb_notes_added = 1 }))
+
               UIManager:close(chatgpt_viewer)
               ui.highlight:onClose()
             end

@@ -4,6 +4,7 @@ local UIManager = require("ui/uimanager")
 local TextBoxWidget = require("ui/widget/textboxwidget")
 local PROMPTS = require("prompts")
 local _ = require("gettext")
+local Event = require("ui/event")
 
 local queryGemini = require("gemini_query")
 
@@ -44,7 +45,13 @@ local function showGeminiDictDialog(ui, highlightedText, message_history)
   local chatgpt_viewer = nil
 
   local function handleAddToNote()
-    ui.highlight:addNote(answer)
+    -- ui.highlight:addNote(answer)
+    local index = ui.highlight:saveHighlight(true)
+    local a = ui.annotation.annotations[index]
+    a.note = result_text
+    ui:handleEvent(Event:new("AnnotationsModified",
+                          { a, nb_highlights_added = -1, nb_notes_added = 1 }))
+
     UIManager:close(chatgpt_viewer)
     ui.highlight:onClose()
   end
