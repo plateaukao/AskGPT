@@ -81,7 +81,7 @@ function ChatGPTViewer:init()
   }
   self.width = self.width or (Screen:getWidth() * 2 / 3)
   -- self.height = self.height or Screen:getHeight() - Screen:scaleBySize(30)
-  self.height = Screen:scaleBySize(600)
+  self.height = Screen:scaleBySize(400)
 
   self._find_next = false
   self._find_next_button = false
