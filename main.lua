@@ -41,6 +41,13 @@ function checkNetworkStatus()
 end
 
 function AskGPT:init()
+  -- remove some that I don't use
+  self.ui.highlight:removeFromHighlightDialog("01_select")
+  self.ui.highlight:removeFromHighlightDialog("04_add_note")
+  self.ui.highlight:removeFromHighlightDialog("05_wikipedia")
+  self.ui.highlight:removeFromHighlightDialog("08_share_text")
+  self.ui.highlight:removeFromHighlightDialog("09_view_html")
+
   self.ui.highlight:addToHighlightDialog("askgpt_ChatGPT", function(_reader_highlight_instance)
     return {
       text = _("Ask ChatGPT"),
