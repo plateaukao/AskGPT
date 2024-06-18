@@ -5,7 +5,7 @@ local json = require("json")
 
 
 local function queryGemini(context_message)
-  local api_url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=" .. API_KEY.key
+  local api_url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=" .. API_KEY.key
 
   local headers = {
     ["Content-Type"] = "application/json",

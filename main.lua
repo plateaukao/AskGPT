@@ -16,7 +16,12 @@ local AskGPT = InputContainer:new {
   is_doc_only = true,
 }
 
-function showLoadingDialog()
+function showLoadingDialog(highlight_instance)
+  if highlight_instance.highlight_dialog then
+    UIManager:close(highlight_instance.highlight_dialog)
+    highlight_instance.highlight_dialog = nil
+  end
+
   local loading = InfoMessage:new {
     text = _("Loading..."),
     timeout = 0.1,
@@ -56,7 +61,7 @@ function AskGPT:init()
         if not checkNetworkStatus() then
           return
         end
-        showLoadingDialog()
+        showLoadingDialog(_reader_highlight_instance)
         UIManager:scheduleIn(0.1, function()
           showDictionaryDialog(self.ui, _reader_highlight_instance.selected_text.text)
         end)
@@ -71,7 +76,7 @@ function AskGPT:init()
         if not checkNetworkStatus() then
           return
         end
-        showLoadingDialog()
+        showLoadingDialog(_reader_highlight_instance)
         UIManager:scheduleIn(0.1, function()
           showGeminiDictDialog(self.ui, _reader_highlight_instance.selected_text.text)
         end)
@@ -86,7 +91,7 @@ function AskGPT:init()
         if not checkNetworkStatus() then
           return
         end
-        showLoadingDialog()
+        showLoadingDialog(_reader_highlight_instance)
         UIManager:scheduleIn(0.1, function()
           showTranslateDialog(self.ui, _reader_highlight_instance.selected_text.text)
         end)
