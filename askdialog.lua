@@ -99,7 +99,7 @@ local function showChatGPTDialog(ui, highlightedText, message_history)
               table.insert(message_history, { role = "assistant", content = answer })
 
               -- Update the result text
-              local result_text = createResultText(highlightedText, message_history)
+              result_text = createResultText(highlightedText, message_history)
 
               -- Update the text and refresh the viewer
               chatgpt_viewer:update(result_text)

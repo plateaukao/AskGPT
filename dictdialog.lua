@@ -44,7 +44,7 @@ local function showChatGPTDialog(ui, highlightedText, message_history)
 
   local function handleNewQuestion(chatgpt_viewer, question)
     local answer = queryChatGPT(message_history)
-    local result_text = createResultText(highlightedText, answer)
+    result_text = createResultText(highlightedText, answer)
 
     -- Update the text and refresh the viewer
     chatgpt_viewer:update(result_text)
