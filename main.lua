@@ -8,6 +8,7 @@ local InfoMessage = require("ui/widget/infomessage")
 local showChatGPTDialog = require("askdialog")
 local showDictionaryDialog = require("dictdialog")
 local showTranslateDialog = require("translatedialog")
+local showSummaryDialog = require("summarydialog")
 
 local showGeminiDictDialog = require("gemini_dictdialog")
 
@@ -42,7 +43,6 @@ end
 
 function AskGPT:init()
   -- remove some that I don't use
-  self.ui.highlight:removeFromHighlightDialog("01_select")
   self.ui.highlight:removeFromHighlightDialog("04_add_note")
   self.ui.highlight:removeFromHighlightDialog("05_wikipedia")
   self.ui.highlight:removeFromHighlightDialog("08_share_text")
@@ -86,6 +86,21 @@ function AskGPT:init()
         showLoadingDialog(_reader_highlight_instance)
         UIManager:scheduleIn(0.1, function()
           showGeminiDictDialog(self.ui, _reader_highlight_instance.selected_text.text)
+        end)
+      end,
+    }
+  end)
+  self.ui.highlight:addToHighlightDialog("askgpt_summary", function(_reader_highlight_instance)
+    return {
+      text = _("Summarize Chapter"),
+      enabled = true,
+      callback = function()
+        if not checkNetworkStatus() then
+          return
+        end
+        showLoadingDialog(_reader_highlight_instance)
+        UIManager:scheduleIn(0.1, function()
+          showSummaryDialog(self.ui, _reader_highlight_instance)
         end)
       end,
     }

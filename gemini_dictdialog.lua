@@ -25,9 +25,7 @@ local function showGeminiDictDialog(ui, highlightedText, message_history)
 
   local function createResultText(highlightedText, answer)
     local result_text = 
-      TextBoxWidget.PTF_HEADER .. 
-      prev_context .. TextBoxWidget.PTF_BOLD_START .. highlightedText .. TextBoxWidget.PTF_BOLD_END .. next_context .. "\n\n" ..
-      answer
+      TextBoxWidget.PTF_HEADER ..  answer
 
     return result_text
   end

@@ -13,7 +13,7 @@ local function queryChatGPT(message_history)
   }
 
   local requestBody = json.encode({
-    model = "gpt-4o",
+    model = "gpt-4.1-mini",
     messages = message_history,
   })
 

@@ -34,7 +34,14 @@ If you clone this project, you should be able to put the directory, `askgpt.kopl
 
 ## How To Use
 
-To use AskGPT, simply highlight the text that you want to ask a question about, and select "Ask ChatGPT" from the menu. The plugin will then send your highlighted text to the ChatGPT API, and display the answer to your question in a pop-up window.
+To use AskGPT, simply highlight the text that you want to ask a question about, and select the desired action from the menu. The plugin will then send your highlighted text (or the detected chapter, for summaries) to the ChatGPT API, and display the answer to your question in a pop-up window.
+
+### Available actions
+
+- **Ask ChatGPT** – prompt the model with a custom question about the selection.
+- **GPT Dictionary / Gemini Dictionary** – get concise dictionary-style explanations.
+- **GPT Translate** – translate the highlighted passage into Traditional Chinese.
+- **Summarize Chapter** – capture the chapter that contains the current selection and generate a Traditional Chinese study guide style summary (three bullet points, character/theme notes, and a reflection question). If the book lacks chapter metadata or the format cannot be extracted, the plugin shows an error.
 
 I hope you enjoy using this plugin and that it enhances your e-reading experience. If you have any feedback or suggestions, please let me know!
 
