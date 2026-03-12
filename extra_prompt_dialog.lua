@@ -37,11 +37,11 @@ local function showExtraPromptDialog(ui, highlightedText, button_config)
     local answer = queryGemini(final_prompt, AskGPTConfig.load().gemini_stream and {
       on_delta = function(partial)
         result_text = partial
-        viewer:update(result_text)
+        viewer = viewer:update(result_text)
       end,
     } or nil)
     result_text = answer
-    viewer:update(result_text)
+    viewer = viewer:update(result_text)
     return
   end
 
@@ -57,12 +57,12 @@ local function showExtraPromptDialog(ui, highlightedText, button_config)
   }, AskGPTConfig.load().openai_stream and {
     on_delta = function(partial)
       result_text = partial
-      viewer:update(result_text)
+      viewer = viewer:update(result_text)
     end,
   } or nil)
 
   result_text = answer
-  viewer:update(result_text)
+  viewer = viewer:update(result_text)
 end
 
 return showExtraPromptDialog

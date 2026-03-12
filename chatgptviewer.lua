@@ -474,7 +474,35 @@ function ChatGPTViewer:handleTextSelection(text, hold_duration, start_idx, end_i
 end
 
 function ChatGPTViewer:update(new_text)
-  UIManager:close(self)
+  self.text = new_text
+
+  local updated = false
+  if self.scroll_text_w then
+    if type(self.scroll_text_w.setText) == "function" then
+      self.scroll_text_w:setText(new_text)
+      updated = true
+    elseif self.scroll_text_w.text_widget and type(self.scroll_text_w.text_widget.setText) == "function" then
+      self.scroll_text_w.text_widget:setText(new_text)
+      updated = true
+    elseif type(self.scroll_text_w.update) == "function" then
+      self.scroll_text_w:update(new_text)
+      updated = true
+    end
+  end
+
+  if updated then
+    if self.scroll_text_w and type(self.scroll_text_w.scrollToBottom) == "function" then
+      self.scroll_text_w:scrollToBottom()
+    end
+    UIManager:setDirty(self, function()
+      return "partial", self.frame.dimen
+    end)
+    return self
+  end
+
+  local target = self._active_viewer or self
+  UIManager:close(target)
+
   local updated_viewer = ChatGPTViewer:new {
     title = self.title,
     text = new_text,
@@ -484,9 +512,15 @@ function ChatGPTViewer:update(new_text)
     buttons_table = self.buttons_table,
     onAskQuestion = self.onAskQuestion,
     onAddToNote = self.onAddToNote,
+    ui = self.ui,
   }
-  updated_viewer.scroll_text_w:scrollToBottom()
+  self._active_viewer = updated_viewer
+  updated_viewer._active_viewer = updated_viewer
+  if updated_viewer.scroll_text_w and type(updated_viewer.scroll_text_w.scrollToBottom) == "function" then
+    updated_viewer.scroll_text_w:scrollToBottom()
+  end
   UIManager:show(updated_viewer)
+  return updated_viewer
 end
 
 return ChatGPTViewer

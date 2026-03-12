@@ -49,7 +49,7 @@ local function showChatGPTDialog(ui, highlightedText, message_history)
     local answer = queryChatGPT(message_history)
     table.insert(message_history, { role = "assistant", content = answer })
     result_text = createResultText(highlightedText, message_history)
-    viewer:update(result_text)
+    chatgpt_viewer = viewer:update(result_text)
   end
 
   chatgpt_viewer = ChatGPTViewer:new {
@@ -70,13 +70,13 @@ local function showChatGPTDialog(ui, highlightedText, message_history)
       end
       table.insert(temp_history, { role = "assistant", content = partial })
       result_text = createResultText(highlightedText, temp_history)
-      chatgpt_viewer:update(result_text)
+      chatgpt_viewer = chatgpt_viewer:update(result_text)
     end,
   } or nil)
 
   table.insert(message_history, { role = "assistant", content = answer })
   result_text = createResultText(highlightedText, message_history)
-  chatgpt_viewer:update(result_text)
+  chatgpt_viewer = chatgpt_viewer:update(result_text)
 end
 
 return showChatGPTDialog

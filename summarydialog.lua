@@ -178,7 +178,7 @@ local function showSummaryDialog(ui, highlight_instance)
         end
         table.insert(temp, { role = "assistant", content = partial })
         result_text = buildResultText(metadata_block, temp)
-        viewer:update(result_text)
+        chatgpt_viewer = viewer:update(result_text)
       end,
     } or nil)
     if not ok_answer then
@@ -188,7 +188,7 @@ local function showSummaryDialog(ui, highlight_instance)
     end
     table.insert(message_history, { role = "assistant", content = answer })
     result_text = buildResultText(metadata_block, message_history)
-    viewer:update(result_text)
+    chatgpt_viewer = viewer:update(result_text)
   end
 
   chatgpt_viewer = ChatGPTViewer:new {
@@ -208,7 +208,7 @@ local function showSummaryDialog(ui, highlight_instance)
       end
       table.insert(temp, { role = "assistant", content = partial })
       result_text = buildResultText(metadata_block, temp)
-      chatgpt_viewer:update(result_text)
+      chatgpt_viewer = chatgpt_viewer:update(result_text)
     end,
   } or nil)
 
@@ -219,7 +219,7 @@ local function showSummaryDialog(ui, highlight_instance)
 
   table.insert(message_history, { role = "assistant", content = summary })
   result_text = buildResultText(metadata_block, message_history)
-  chatgpt_viewer:update(result_text)
+  chatgpt_viewer = chatgpt_viewer:update(result_text)
 end
 
 return showSummaryDialog

@@ -53,12 +53,12 @@ local function showChatGPTDialog(ui, highlightedText, message_history)
   local answer = queryChatGPT(message_history, use_stream and {
     on_delta = function(partial)
       result_text = createResultText(partial)
-      chatgpt_viewer:update(result_text)
+      chatgpt_viewer = chatgpt_viewer:update(result_text)
     end,
   } or nil)
 
   result_text = createResultText(answer)
-  chatgpt_viewer:update(result_text)
+  chatgpt_viewer = chatgpt_viewer:update(result_text)
 end
 
 return showChatGPTDialog
