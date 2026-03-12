@@ -33,6 +33,14 @@ function showLoadingDialog(highlight_instance)
   UIManager:show(loading)
 end
 
+function isStreamMode(provider)
+  local config = AskGPTConfig.load()
+  if provider == "gemini" then
+    return config.gemini_stream
+  end
+  return config.openai_stream
+end
+
 function checkNetworkStatus()
   if not NetworkMgr:isConnected() then
     UIManager:show(InfoMessage:new {
@@ -59,7 +67,9 @@ function AskGPT:addExtraButtons()
             if not checkNetworkStatus() then
               return
             end
-            showLoadingDialog(_reader_highlight_instance)
+            if not isStreamMode(button.provider) then
+              showLoadingDialog(_reader_highlight_instance)
+            end
             UIManager:scheduleIn(0.1, function()
               showExtraPromptDialog(self.ui, _reader_highlight_instance.selected_text.text, button)
             end)
@@ -97,7 +107,9 @@ function AskGPT:init()
         if not checkNetworkStatus() then
           return
         end
-        showLoadingDialog(_reader_highlight_instance)
+        if not isStreamMode("openai") then
+          showLoadingDialog(_reader_highlight_instance)
+        end
         UIManager:scheduleIn(0.1, function()
           showDictionaryDialog(self.ui, _reader_highlight_instance.selected_text.text)
         end)
@@ -112,7 +124,9 @@ function AskGPT:init()
         if not checkNetworkStatus() then
           return
         end
-        showLoadingDialog(_reader_highlight_instance)
+        if not isStreamMode("gemini") then
+          showLoadingDialog(_reader_highlight_instance)
+        end
         UIManager:scheduleIn(0.1, function()
           showGeminiDictDialog(self.ui, _reader_highlight_instance.selected_text.text)
         end)
@@ -127,7 +141,9 @@ function AskGPT:init()
         if not checkNetworkStatus() then
           return
         end
-        showLoadingDialog(_reader_highlight_instance)
+        if not isStreamMode("openai") then
+          showLoadingDialog(_reader_highlight_instance)
+        end
         UIManager:scheduleIn(0.1, function()
           showSummaryDialog(self.ui, _reader_highlight_instance)
         end)
@@ -142,7 +158,9 @@ function AskGPT:init()
         if not checkNetworkStatus() then
           return
         end
-        showLoadingDialog(_reader_highlight_instance)
+        if not isStreamMode("openai") then
+          showLoadingDialog(_reader_highlight_instance)
+        end
         UIManager:scheduleIn(0.1, function()
           showTranslateDialog(self.ui, _reader_highlight_instance.selected_text.text)
         end)

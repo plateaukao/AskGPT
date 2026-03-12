@@ -48,6 +48,8 @@ AskGPT now supports a built-in **AskGPT Config** action in the highlight menu. Y
 
 Use `{{highlight}}` inside a custom prompt to inject the selected text.
 
+When stream mode is enabled, AskGPT opens the result dialog immediately (without the loading popup) and updates the text as partial chunks arrive.
+
 Example config JSON:
 
 ```json

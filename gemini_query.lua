@@ -18,15 +18,24 @@ local function extractGeminiText(candidate)
   return table.concat(parts)
 end
 
+local function decodeGeminiDelta(payload)
+  if payload == "[DONE]" then
+    return nil
+  end
+  local ok, decoded = pcall(json.decode, payload)
+  if not ok or not decoded or not decoded.candidates or not decoded.candidates[1] then
+    return nil
+  end
+  return extractGeminiText(decoded.candidates[1])
+end
+
 local function parseGeminiStream(raw)
   local pieces = {}
   for line in raw:gmatch("[^\r\n]+") do
     local payload = line:match("^data:%s*(.+)$")
-    if payload and payload ~= "[DONE]" then
-      local ok, decoded = pcall(json.decode, payload)
-      if ok and decoded and decoded.candidates and decoded.candidates[1] then
-        table.insert(pieces, extractGeminiText(decoded.candidates[1]))
-      end
+    local delta = payload and decodeGeminiDelta(payload) or nil
+    if delta and delta ~= "" then
+      table.insert(pieces, delta)
     end
   end
   return table.concat(pieces)
@@ -40,11 +49,11 @@ local function queryGemini(context_message, opts)
     use_stream = config.gemini_stream
   end
 
-  local method_name = use_stream and "streamGenerateContent?alt=sse" or "generateContent"
-  local api_url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:"
-    .. method_name .. "&key=" .. API_KEY.key
-
-  if not use_stream then
+  local api_url
+  if use_stream then
+    api_url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:streamGenerateContent?alt=sse&key="
+      .. API_KEY.key
+  else
     api_url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=" .. API_KEY.key
   end
 
@@ -71,8 +80,48 @@ local function queryGemini(context_message, opts)
   }
 
   local requestBody = json.encode(data)
-
   local responseBody = {}
+
+  if use_stream and opts.on_delta then
+    local partial = ""
+    local pending = ""
+    local stream_sink = function(chunk)
+      if not chunk then
+        return 1
+      end
+      table.insert(responseBody, chunk)
+      pending = pending .. chunk
+      while true do
+        local line_end = pending:find("\n", 1, true)
+        if not line_end then
+          break
+        end
+        local line = pending:sub(1, line_end - 1):gsub("\r$", "")
+        pending = pending:sub(line_end + 1)
+        local payload = line:match("^data:%s*(.+)$")
+        local delta = payload and decodeGeminiDelta(payload) or nil
+        if delta and delta ~= "" then
+          partial = partial .. delta
+          opts.on_delta(partial)
+        end
+      end
+      return 1
+    end
+
+    local _, code = https.request {
+      url = api_url,
+      method = "POST",
+      headers = headers,
+      source = ltn12.source.string(requestBody),
+      sink = stream_sink,
+    }
+
+    if code ~= 200 then
+      return "Error querying Gemini API: " .. tostring(code)
+    end
+
+    return partial ~= "" and partial or parseGeminiStream(table.concat(responseBody))
+  end
 
   local _, code = https.request {
     url = api_url,
