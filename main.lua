@@ -9,8 +9,11 @@ local showChatGPTDialog = require("askdialog")
 local showDictionaryDialog = require("dictdialog")
 local showTranslateDialog = require("translatedialog")
 local showSummaryDialog = require("summarydialog")
+local showConfigDialog = require("configdialog")
 
 local showGeminiDictDialog = require("gemini_dictdialog")
+local showExtraPromptDialog = require("extra_prompt_dialog")
+local AskGPTConfig = require("config")
 
 local AskGPT = InputContainer:new {
   name = "askgpt",
@@ -30,6 +33,14 @@ function showLoadingDialog(highlight_instance)
   UIManager:show(loading)
 end
 
+function isStreamMode(provider)
+  local config = AskGPTConfig.load()
+  if provider == "gemini" then
+    return config.gemini_stream
+  end
+  return config.openai_stream
+end
+
 function checkNetworkStatus()
   if not NetworkMgr:isConnected() then
     UIManager:show(InfoMessage:new {
@@ -39,6 +50,34 @@ function checkNetworkStatus()
     return false
   end
   return true
+end
+
+function AskGPT:addExtraButtons()
+  local config = AskGPTConfig.load()
+  local extra_buttons = config.extra_buttons or {}
+
+  for idx, button in ipairs(extra_buttons) do
+    if type(button) == "table" and button.text and button.prompt then
+      local button_id = "askgpt_extra_" .. tostring(button.id or idx)
+      self.ui.highlight:addToHighlightDialog(button_id, function(_reader_highlight_instance)
+        return {
+          text = _(button.text),
+          enabled = Device:hasClipboard(),
+          callback = function()
+            if not checkNetworkStatus() then
+              return
+            end
+            if not isStreamMode(button.provider) then
+              showLoadingDialog(_reader_highlight_instance)
+            end
+            UIManager:scheduleIn(0.1, function()
+              showExtraPromptDialog(self.ui, _reader_highlight_instance.selected_text.text, button)
+            end)
+          end,
+        }
+      end)
+    end
+  end
 end
 
 function AskGPT:init()
@@ -68,7 +107,9 @@ function AskGPT:init()
         if not checkNetworkStatus() then
           return
         end
-        showLoadingDialog(_reader_highlight_instance)
+        if not isStreamMode("openai") then
+          showLoadingDialog(_reader_highlight_instance)
+        end
         UIManager:scheduleIn(0.1, function()
           showDictionaryDialog(self.ui, _reader_highlight_instance.selected_text.text)
         end)
@@ -83,7 +124,9 @@ function AskGPT:init()
         if not checkNetworkStatus() then
           return
         end
-        showLoadingDialog(_reader_highlight_instance)
+        if not isStreamMode("gemini") then
+          showLoadingDialog(_reader_highlight_instance)
+        end
         UIManager:scheduleIn(0.1, function()
           showGeminiDictDialog(self.ui, _reader_highlight_instance.selected_text.text)
         end)
@@ -98,7 +141,9 @@ function AskGPT:init()
         if not checkNetworkStatus() then
           return
         end
-        showLoadingDialog(_reader_highlight_instance)
+        if not isStreamMode("openai") then
+          showLoadingDialog(_reader_highlight_instance)
+        end
         UIManager:scheduleIn(0.1, function()
           showSummaryDialog(self.ui, _reader_highlight_instance)
         end)
@@ -113,13 +158,32 @@ function AskGPT:init()
         if not checkNetworkStatus() then
           return
         end
-        showLoadingDialog(_reader_highlight_instance)
+        if not isStreamMode("openai") then
+          showLoadingDialog(_reader_highlight_instance)
+        end
         UIManager:scheduleIn(0.1, function()
           showTranslateDialog(self.ui, _reader_highlight_instance.selected_text.text)
         end)
       end,
     }
   end)
+
+  self.ui.highlight:addToHighlightDialog("askgpt_config", function(_reader_highlight_instance)
+    return {
+      text = _("AskGPT Config"),
+      enabled = true,
+      callback = function()
+        showConfigDialog(function()
+          UIManager:show(InfoMessage:new {
+            text = _("Config saved. Reopen book to reload extra buttons."),
+            timeout = 2,
+          })
+        end)
+      end,
+    }
+  end)
+
+  self:addExtraButtons()
 end
 
 return AskGPT

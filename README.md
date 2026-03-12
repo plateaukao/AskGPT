@@ -38,6 +38,42 @@ To use AskGPT, simply highlight the text that you want to ask a question about, 
 
 ### Available actions
 
+### Configuration
+
+AskGPT now supports a built-in **AskGPT Config** action in the highlight menu. You can configure:
+
+- `openai_stream`: enable/disable OpenAI Chat Completions stream mode.
+- `gemini_stream`: enable/disable Gemini stream mode.
+- `extra_buttons`: define custom highlight-menu buttons with your own prompt templates.
+
+Use `{{highlight}}` inside a custom prompt to inject the selected text.
+
+When stream mode is enabled, AskGPT opens the result dialog immediately (without the loading popup) and updates the text as partial chunks arrive.
+
+Example config JSON:
+
+```json
+{
+  "openai_stream": true,
+  "gemini_stream": false,
+  "extra_buttons": [
+    {
+      "id": "simple_explain",
+      "text": "Explain simply",
+      "provider": "openai",
+      "prompt": "Please explain this in easy Traditional Chinese:\n{{highlight}}"
+    },
+    {
+      "id": "key_points",
+      "text": "Key points",
+      "provider": "gemini",
+      "prompt": "List the key points from this excerpt:\n{{highlight}}"
+    }
+  ]
+}
+```
+
+
 - **Ask ChatGPT** – prompt the model with a custom question about the selection.
 - **GPT Dictionary / Gemini Dictionary** – get concise dictionary-style explanations.
 - **GPT Translate** – translate the highlighted passage into Traditional Chinese.

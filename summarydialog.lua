@@ -7,6 +7,7 @@ local _ = require("gettext")
 
 local PROMPTS = require("prompts")
 local queryChatGPT = require("gpt_query")
+local AskGPTConfig = require("config")
 
 local MAX_CHAPTER_CHARS = 12000
 
@@ -58,8 +59,7 @@ local function getChapterBounds(ui, anchor)
   if not end_xpointer and ui.document.getPageCount then
     local doc_pages = ui.document:getPageCount()
     if doc_pages then
-      end_xpointer = ui.document:getPageXPointer(doc_pages + 1)
-        or ui.document:getPageXPointer(doc_pages)
+      end_xpointer = ui.document:getPageXPointer(doc_pages + 1) or ui.document:getPageXPointer(doc_pages)
     end
   end
 
@@ -104,9 +104,7 @@ local function buildMetadataText(meta, truncated, chapter_len)
   local header = {}
   table.insert(header, T(_("Chapter: %1"), meta.title))
   table.insert(header, T(_("Pages: %1-%2"), meta.page_start, meta.page_end))
-  table.insert(header, T(_("Captured characters: %1%2"),
-    chapter_len,
-    truncated and _(" (truncated)") or ""))
+  table.insert(header, T(_("Captured characters: %1%2"), chapter_len, truncated and _(" (truncated)") or ""))
   return table.concat(header, "\n")
 end
 
@@ -153,33 +151,18 @@ local function showSummaryDialog(ui, highlight_instance)
   )
 
   local message_history = {
-    {
-      role = "system",
-      content = PROMPTS.chapter_summary,
-    },
-    {
-      role = "user",
-      content = chapter_payload,
-    },
+    { role = "system", content = PROMPTS.chapter_summary },
+    { role = "user", content = chapter_payload },
   }
 
-  local ok, summary = pcall(queryChatGPT, message_history)
-  if not ok then
-    showError(_("Failed to fetch summary."))
-    return
-  end
-
-  table.insert(message_history, { role = "assistant", content = summary })
   local result_text = buildResultText(metadata_block, message_history)
-
   local chatgpt_viewer
 
   local function handleAddToNote()
     local index = ui.highlight:saveHighlight(true)
     local annotation = ui.annotation.annotations[index]
     annotation.note = result_text
-    ui:handleEvent(Event:new("AnnotationsModified",
-      { annotation, nb_highlights_added = -1, nb_notes_added = 1 }))
+    ui:handleEvent(Event:new("AnnotationsModified", { annotation, nb_highlights_added = -1, nb_notes_added = 1 }))
 
     UIManager:close(chatgpt_viewer)
     ui.highlight:onClose()
@@ -187,7 +170,17 @@ local function showSummaryDialog(ui, highlight_instance)
 
   local function handleNewQuestion(viewer, question)
     table.insert(message_history, { role = "user", content = question })
-    local ok_answer, answer = pcall(queryChatGPT, message_history)
+    local ok_answer, answer = pcall(queryChatGPT, message_history, AskGPTConfig.load().openai_stream and {
+      on_delta = function(partial)
+        local temp = {}
+        for i = 1, #message_history do
+          temp[i] = message_history[i]
+        end
+        table.insert(temp, { role = "assistant", content = partial })
+        result_text = buildResultText(metadata_block, temp)
+        chatgpt_viewer = viewer:update(result_text)
+      end,
+    } or nil)
     if not ok_answer then
       table.remove(message_history)
       showError(_("Failed to fetch summary."))
@@ -195,7 +188,7 @@ local function showSummaryDialog(ui, highlight_instance)
     end
     table.insert(message_history, { role = "assistant", content = answer })
     result_text = buildResultText(metadata_block, message_history)
-    viewer:update(result_text)
+    chatgpt_viewer = viewer:update(result_text)
   end
 
   chatgpt_viewer = ChatGPTViewer:new {
@@ -205,8 +198,28 @@ local function showSummaryDialog(ui, highlight_instance)
     onAskQuestion = handleNewQuestion,
     onAddToNote = handleAddToNote,
   }
-
   UIManager:show(chatgpt_viewer)
+
+  local ok, summary = pcall(queryChatGPT, message_history, AskGPTConfig.load().openai_stream and {
+    on_delta = function(partial)
+      local temp = {}
+      for i = 1, #message_history do
+        temp[i] = message_history[i]
+      end
+      table.insert(temp, { role = "assistant", content = partial })
+      result_text = buildResultText(metadata_block, temp)
+      chatgpt_viewer = chatgpt_viewer:update(result_text)
+    end,
+  } or nil)
+
+  if not ok then
+    showError(_("Failed to fetch summary."))
+    return
+  end
+
+  table.insert(message_history, { role = "assistant", content = summary })
+  result_text = buildResultText(metadata_block, message_history)
+  chatgpt_viewer = chatgpt_viewer:update(result_text)
 end
 
 return showSummaryDialog
