@@ -20,7 +20,9 @@ local function showChatGPTDialog(ui, highlightedText, message_history)
       "You are a dictionary with high quality detail vocabulary definitions and examples.",
     },
   }
-  prev_context, next_context = ui.highlight:getSelectedWordContext(10)
+  local prev_context, next_context = ui.highlight:getSelectedWordContext(10)
+  prev_context = prev_context or ""
+  next_context = next_context or ""
   -- Give context to the question
   local context_message = {
     role = "user",

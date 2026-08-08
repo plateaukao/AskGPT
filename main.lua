@@ -41,6 +41,43 @@ function checkNetworkStatus()
   return true
 end
 
+-- Replace the dictionary popup's "Close" button with a "GPT" button, so a
+-- lookup whose result isn't clear enough can be sent to the GPT dictionary.
+-- Tap closes the popup and asks GPT; hold keeps the original close-all behavior.
+-- The popup can still be dismissed by tapping outside it or via the title bar.
+local DictQuickLookup = require("ui/widget/dictquicklookup")
+if DictQuickLookup._getButtonPool and not DictQuickLookup._askgpt_gpt_button then
+  DictQuickLookup._askgpt_gpt_button = true
+  local orig_getButtonPool = DictQuickLookup._getButtonPool
+  DictQuickLookup._getButtonPool = function(dict_popup)
+    local pool = orig_getButtonPool(dict_popup)
+    if not dict_popup.is_wiki and not dict_popup:isDocless() then
+      pool.close = {
+        id = "close",
+        text = _("GPT"),
+        callback = function()
+          if not checkNetworkStatus() then
+            return
+          end
+          local ui = dict_popup.ui
+          local word = dict_popup.word
+          -- no_clear: keep the text selection so the GPT dictionary can
+          -- still fetch the surrounding context of the word
+          dict_popup:onClose(true)
+          showLoadingDialog(ui.highlight)
+          UIManager:scheduleIn(0.1, function()
+            showDictionaryDialog(ui, word)
+          end)
+        end,
+        hold_callback = function()
+          dict_popup:onHoldClose()
+        end,
+      }
+    end
+    return pool
+  end
+end
+
 function AskGPT:init()
   -- remove some that I don't use
   self.ui.highlight:removeFromHighlightDialog("04_add_note")
